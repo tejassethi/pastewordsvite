@@ -74,37 +74,30 @@ export const FileUpload = ({
     if (newFile) {
       setIsLoading(true);
       try {
-        const word = await getRandomWord();
-        if (!word) {
-          throw new Error("Failed to generate word");
+        const records = await pb.collection("uploads").getList(1, 1, {
+          filter: 'file = ""',
+          sort: "@random",
+          $autoCancel: false,
+          requestKey: null,
+        });
+
+        if (records.totalItems === 0) {
+          throw new Error("No available slots found");
         }
 
-        // Create FormData for file upload
         const formData = new FormData();
-        formData.append("word", word);
         formData.append("file", newFile);
 
-        // Log the FormData contents for debugging
-        console.log("Word:", word);
-        console.log("File:", newFile.name, newFile.size, newFile.type);
-
-        try {
-          // Upload file to PocketBase with explicit error handling
-          const record = await pb.collection("uploads").create(formData, {
+        const record = await pb
+          .collection("uploads")
+          .update(records.items[0].id, formData, {
             requestKey: null,
           });
-          console.log("Upload successful:", record);
 
-          setUploaded(true);
-          setWords(word);
-          setCanUpload(false);
-        } catch (uploadError: any) {
-          console.error("Detailed upload error:", uploadError);
-          if (uploadError.response) {
-            console.error("Response data:", uploadError.response.data);
-          }
-          throw new Error(uploadError.message || "Upload failed");
-        }
+        console.log("Upload successful:", record);
+        setUploaded(true);
+        setWords(record.word);
+        setCanUpload(false);
       } catch (error) {
         console.error("Error uploading file:", error);
         setError("Error uploading file: " + (error as Error).message);
@@ -145,54 +138,6 @@ export const FileUpload = ({
       alert(errorMessage);
     },
   });
-
-  const getRandomWord = async (): Promise<string | undefined> => {
-    const response = await fetch("/combinations.txt");
-    const text = await response.text();
-    const words = text
-      .split("\n")
-      .filter(
-        (word) =>
-          word &&
-          word.trim() !== "" &&
-          !word.includes("$") &&
-          /^[a-zA-Z]+$/.test(word)
-      );
-
-    let word: string | undefined;
-    let isWordUsed = true;
-    let attempts = 0;
-    const maxAttempts = 10;
-
-    while (isWordUsed && attempts < maxAttempts) {
-      attempts++;
-      word = words[Math.floor(Math.random() * words.length)];
-      if (!word || word.includes("$")) continue;
-
-      try {
-        const records = await pb.collection("uploads").getList(1, 1, {
-          filter: `word = "${word}"`,
-          $autoCancel: false,
-          requestKey: null,
-        });
-
-        if (records.totalItems === 0) {
-          isWordUsed = false;
-        }
-      } catch (error) {
-        console.error("Error checking word usage:", error);
-        isWordUsed = false;
-      }
-    }
-
-    if (attempts >= maxAttempts) {
-      throw new Error(
-        "Failed to find an available word after multiple attempts"
-      );
-    }
-
-    return word;
-  };
 
   const handleDownload = async () => {
     if (!words) {
