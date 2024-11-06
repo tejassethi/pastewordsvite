@@ -82,7 +82,7 @@ export const FileUpload = ({
         });
 
         if (records.totalItems === 0) {
-          throw new Error("No available slots found");
+          throw new Error("Please try again later.");
         }
 
         const formData = new FormData();
