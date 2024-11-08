@@ -225,6 +225,12 @@ export const FileUpload = ({
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleDownload();
+    }
+  };
+
   return (
     <div className="w-[80%] lg:w-full max-w-xl mx-auto">
       {!downloadUrl && (
@@ -248,7 +254,7 @@ export const FileUpload = ({
                     <motion.div
                       layoutId="file-upload"
                       className={cn(
-                        "relative overflow-hidden z-40 bg-white dark:bg-neutral-900 flex flex-col items-start justify-start md:h-24 p-4 mt-4 w-full mx-auto rounded-md",
+                        "relative overflow-hidden z-40 bg-neutral-900 flex flex-col items-start justify-start md:h-24 p-4 mt-4 w-full mx-auto rounded-md",
                         "shadow-sm"
                       )}
                     >
@@ -257,7 +263,7 @@ export const FileUpload = ({
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           layout
-                          className="text-base text-neutral-700 dark:text-neutral-300 truncate max-w-xs"
+                          className="text-base text-neutral-300 truncate max-w-xs"
                         >
                           {file.name}
                         </motion.p>
@@ -265,18 +271,18 @@ export const FileUpload = ({
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           layout
-                          className="rounded-lg px-2 py-1 w-fit flex-shrink-0 text-sm text-neutral-600 dark:bg-neutral-800 dark:text-white shadow-input"
+                          className="rounded-lg px-2 py-1 w-fit flex-shrink-0 text-sm bg-neutral-800 text-white shadow-input"
                         >
                           {(file.size / (1024 * 1024)).toFixed(2)} MB
                         </motion.p>
                       </div>
 
-                      <div className="flex text-sm md:flex-row flex-col items-start md:items-center w-full mt-2 justify-between text-neutral-600 dark:text-neutral-400">
+                      <div className="flex text-sm md:flex-row flex-col items-start md:items-center w-full mt-2 justify-between text-neutral-400">
                         <motion.p
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           layout
-                          className="px-1 py-0.5 rounded-md bg-gray-100 dark:bg-neutral-800 "
+                          className="px-1 py-0.5 rounded-md bg-neutral-800 "
                         >
                           {file.type}
                         </motion.p>
@@ -302,7 +308,7 @@ export const FileUpload = ({
                       damping: 20,
                     }}
                     className={cn(
-                      "relative group-hover/file:shadow-2xl z-40 bg-white dark:bg-neutral-900 flex items-center justify-center h-32 mt-4 w-full max-w-[8rem] mx-auto rounded-md",
+                      "relative group-hover/file:shadow-2xl z-40 bg-neutral-900 flex items-center justify-center h-32 mt-4 w-full max-w-[8rem] mx-auto rounded-md",
                       "shadow-[0px_10px_50px_rgba(0,0,0,0.1)]"
                     )}
                   >
@@ -338,25 +344,25 @@ export const FileUpload = ({
       {downloadUrl && (
         <motion.div
           layoutId="file-upload"
-          className="relative mt-10 overflow-hidden z-40 bg-white dark:bg-neutral-900 flex flex-col items-start justify-start md:h-24 p-4 w-full mx-auto rounded-md shadow-sm"
+          className="relative mt-10 overflow-hidden z-40 bg-neutral-900 flex flex-col items-start justify-start md:h-24 p-4 w-full mx-auto rounded-md shadow-sm"
         >
           <div className="flex justify-between w-full items-center gap-4">
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               layout
-              className="text-base text-neutral-700 dark:text-neutral-300 truncate max-w-xs"
+              className="text-base text-neutral-300 truncate max-w-xs"
             >
               {downloadedFile?.name}
             </motion.p>
           </div>
 
-          <div className="flex text-sm md:flex-row flex-col items-center w-full mt-2 justify-between text-neutral-600 dark:text-neutral-400">
+          <div className="flex text-sm md:flex-row flex-col items-center w-full mt-2 justify-between text-neutral-400">
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               layout
-              className="px-1 py-0.5 rounded-md bg-gray-100 dark:bg-neutral-800"
+              className="px-1 py-0.5 rounded-mdbg-neutral-800"
             >
               {downloadedFile?.type}
             </motion.p>
@@ -382,9 +388,11 @@ export const FileUpload = ({
               type="text"
               placeholder="Paste Your Words"
               value={words}
-              onChange={(e) =>
-                setWords(e.target.value.replace(/[^a-zA-Z]/g, ""))
-              }
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^a-zA-Z]/g, "");
+                setWords(value.slice(0, 10));
+              }}
+              onKeyDown={handleKeyDown}
               className="py-4 px-4 w-full max-w-md text-base placeholder:text-[#999999] focus:outline-none font-bold z-50 bg-[#171717] rounded-md uppercase text-[#999999] text-center border-slate-800"
             />
             {uploaded && (
@@ -399,6 +407,7 @@ export const FileUpload = ({
             {!uploaded && !downloadUrl && (
               <button
                 onClick={handleDownload}
+                tabIndex={0}
                 className="py-4 px-6 bg-[#171717] text-[#999999] hover:bg-[#171717]/50 rounded-md font-bold transition-colors duration-200 z-40"
               >
                 <IconDownload className="w-5 h-5" />
