@@ -124,7 +124,7 @@ function App() {
 
   return (
     <>
-      <div className="h-screen w-screen bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
+      <div className=" h-dvh w-screen bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
         <div className="grid grid-cols-1 xl:grid-cols-2 h-full w-full container mx-auto">
           <div className="h-full w-full flex flex-col justify-center items-center col-span-1">
             <div className="flex flex-col justify-center items-center">
