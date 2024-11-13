@@ -12,6 +12,7 @@ function App() {
   const [downloadedFile, setDownloadedFile] = useState<{
     name: string;
     url: string;
+    recordId: string;
   } | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -85,10 +86,9 @@ function App() {
         setDownloadedFile({
           name: record.file,
           url: fileUrl,
+          recordId: record.id,
         });
         setWords(record.word);
-
-        await pb.collection("uploads").delete(record.id);
         setError(null);
       } else {
         setError("No file found for these words");
@@ -106,16 +106,31 @@ function App() {
 
     try {
       const response = await fetch(downloadedFile.url);
+      if (!response.ok) throw new Error("Network response was not ok");
+
       const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+      const url = window.URL.createObjectURL(
+        new Blob([blob], {
+          type:
+            response.headers.get("content-type") || "application/octet-stream",
+        })
+      );
+
       const a = document.createElement("a");
       a.style.display = "none";
       a.href = url;
       a.download = downloadedFile.name;
       document.body.appendChild(a);
       a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }, 100);
+
+      if ("recordId" in downloadedFile) {
+        await pb.collection("uploads").delete(downloadedFile.recordId);
+      }
     } catch (error) {
       console.error("Error downloading file:", error);
       setError("Error downloading file. Please try again.");
