@@ -329,7 +329,7 @@ function App() {
                           }}
                           className="flex-1 h-10 w-full border lowercase placeholder:capitalize text-black text-center border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                           placeholder="Paste your words"
-                          maxLength={10}
+                          maxLength={15}
                         />
                         <button
                           type="submit"
