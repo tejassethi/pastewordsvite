@@ -324,7 +324,7 @@ function App() {
                           onChange={(e) => {
                             const value = e.target.value
                               .replace(/[^a-zA-Z]/g, "")
-                              .slice(0, 10);
+                              .slice(0, 15);
                             setDownloadInput(value);
                           }}
                           className="flex-1 h-10 w-full border lowercase placeholder:capitalize text-black text-center border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
